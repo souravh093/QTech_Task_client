@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/constant/products";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 import { toast } from "sonner";
 
@@ -13,8 +14,10 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking add to cart
     dispatch(
       addToCart({
         id: product.id,
@@ -29,8 +32,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
     toast.success(`${product.name} added to cart!`);
   };
 
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+    <Card
+      className="group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer pt-0"
+      onClick={handleCardClick}
+    >
       <div className="relative overflow-hidden">
         <img
           src={product.image}

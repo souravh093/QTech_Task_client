@@ -1,6 +1,7 @@
 import CommonLayout from "@/layouts/CommonLayout";
 import Error from "@/pages/Error/Error";
 import Home from "@/pages/Home/Home";
+import ProductDetail from "@/pages/ProductDetail/ProductDetail";
 
 import { createBrowserRouter } from "react-router-dom";
 
@@ -12,11 +13,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        // lazy: async () => {
-        //   const { default: Home } = await import("@/pages/Home/Home");
-        //   return { Component: Home };
-        // },
         element: <Home />,
+      },
+      {
+        path: "product/:id",
+        element: <ProductDetail />,
       },
     ],
   },
