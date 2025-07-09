@@ -2,22 +2,18 @@ import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Product } from "@/constant/products";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 import { toast } from "sonner";
+import type { IProduct } from "@/types/product/product.interface";
 
-interface ProductCardProps {
-  product: Product;
-}
-
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product }: { product: IProduct }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation when clicking add to cart
+    e.stopPropagation(); 
     dispatch(
       addToCart({
         id: product.id,
@@ -45,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300"
         />
         <Badge className="absolute top-2 left-2 bg-blue-600 hover:bg-blue-700">
           {product.category}
@@ -64,7 +60,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < Math.floor(product.rating)
+                    i < Math.floor(product?.rating || 0)
                       ? "fill-yellow-400 text-yellow-400"
                       : "text-gray-300"
                   }`}

@@ -1,14 +1,17 @@
 import HeroSection from "@/components/shared/HeroSection";
 import ProductCard from "@/components/shared/ProductCard";
-import { DUMMY_PRODUCTS } from "@/constant/products";
+import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton";
+import StartShopping from "@/components/shared/StartShopping";
+import { useGetProductsQuery } from "@/redux/services/baseApi";
+import type { IProduct } from "@/types/product/product.interface";
 
 const Home = () => {
+  const { data: products, isLoading } = useGetProductsQuery(undefined);
+  console.log(products);
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       <HeroSection />
 
-      {/* Products Section */}
       <section id="products" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -22,33 +25,18 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {DUMMY_PRODUCTS.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {isLoading
+              ? Array.from({ length: 8 }).map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))
+              : products?.data.map((product: IProduct) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Shopping?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join thousands of satisfied customers and experience the best online
-            shopping
-          </p>
-          <button
-            onClick={() =>
-              document
-                .getElementById("products")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-colors"
-          >
-            Browse All Products
-          </button>
-        </div>
-      </section>
+      <StartShopping />
     </div>
   );
 };
