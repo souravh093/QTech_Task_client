@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import type { TCartItem } from "@/types/cart/cart.interface";
 import CartSidebar from "./CartSidebar";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,35 +29,21 @@ const Header = () => {
               </h1>
             </div>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8">
-              <a
-                href="#home"
+              <Link
+                to="/"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
               >
                 Home
-              </a>
-              <a
-                href="#products"
+              </Link>
+              <Link
+                to="#products"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
               >
                 Products
-              </a>
-              <a
-                href="#about"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-              >
-                Contact
-              </a>
+              </Link>
             </nav>
 
-            {/* Cart and Mobile Menu */}
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
@@ -72,7 +59,6 @@ const Header = () => {
                 )}
               </Button>
 
-              {/* Mobile menu button */}
               <button
                 className="md:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -86,34 +72,21 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden border-t border-gray-200 py-4">
               <nav className="flex flex-col space-y-4">
-                <a
-                  href="#home"
+                <Link
+                  to="/"
                   className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
                 >
                   Home
-                </a>
-                <a
-                  href="#products"
+                </Link>
+                <Link
+                  to="#products"
                   className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
                 >
                   Products
-                </a>
-                <a
-                  href="#about"
-                  className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-                >
-                  About
-                </a>
-                <a
-                  href="#contact"
-                  className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-                >
-                  Contact
-                </a>
+                </Link>
               </nav>
             </div>
           )}

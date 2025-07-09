@@ -83,7 +83,7 @@ const ProductCard = ({ product }: { product: IProduct }) => {
             <Button
               onClick={handleAddToCart}
               size="sm"
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
             >
               <ShoppingCart className="h-4 w-4" />
               <span>Add to Cart</span>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -17,18 +17,33 @@ import { Separator } from "@/components/ui/separator";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 import { toast } from "sonner";
-import { DUMMY_PRODUCTS } from "@/constant/products";
+import { useLazyGetProductByIdQuery } from "@/redux/services/baseApi";
+import { ProductDetailSkeleton } from "@/components/shared/ProductDetailsSkeleton";
 
 const ProductDetail = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const product = DUMMY_PRODUCTS.find((p) => p.id === id);
+  const [getProduct, { data: product, isLoading }] =
+    useLazyGetProductByIdQuery();
 
-  if (!product) {
+  useEffect(() => {
+    if (id) {
+      getProduct(id);
+    }
+  }, [id, getProduct]);
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  if (!product?.data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -44,23 +59,22 @@ const ProductDetail = () => {
     );
   }
 
-  // For demo purposes, we'll create multiple product images
   const productImages = [
-    product.image,
-    product.image, // In a real app, these would be different images
-    product.image,
-    product.image,
+    product?.data.image,
+    product?.data.image,
+    product?.data.image,
+    product?.data.image,
   ];
 
   const handleAddToCart = () => {
     dispatch(
       addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        description: product.description,
-        category: product.category,
+        id: product?.data.id,
+        name: product?.data.name,
+        price: product?.data.price,
+        image: product?.data.image,
+        description: product?.data.description,
+        category: product?.data.category,
         quantity: quantity,
       })
     );
@@ -89,17 +103,15 @@ const ProductDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square bg-white rounded-lg overflow-hidden shadow-lg">
               <img
                 src={productImages[selectedImage]}
-                alt={product.name}
+                alt={product?.data.name}
                 className="w-full h-full object-cover"
               />
             </div>
 
-            {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-4">
               {productImages.map((image, index) => (
                 <button
@@ -113,7 +125,7 @@ const ProductDetail = () => {
                 >
                   <img
                     src={image}
-                    alt={`${product.name} view ${index + 1}`}
+                    alt={`${product?.data.name} view ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -121,24 +133,37 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <Badge className="mb-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
-                {product.category}
-              </Badge>
+              <div className="flex flex-wrap gap-2">
+                <Badge className="mb-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                  Category:{" "}
+                  <span className="font-bold">{product?.data.category}</span>
+                </Badge>
+
+                <Badge className="mb-2 bg-green-100 text-green-800 hover:bg-green-200">
+                  Brand:{" "}
+                  <span className="font-bold">{product?.data.brand}</span>
+                </Badge>
+
+                <Badge className="mb-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                  Stock:
+                  <span className="font-bold">
+                    {product?.data.stock > 0 ? "In Stock" : "Out of Stock"}
+                  </span>
+                </Badge>
+              </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {product.name}
+                {product?.data.name}
               </h1>
 
-              {/* Rating */}
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={`h-5 w-5 ${
-                        i < Math.floor(product.rating)
+                        i < Math.floor(product?.data.rating)
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-gray-300"
                       }`}
@@ -146,29 +171,23 @@ const ProductDetail = () => {
                   ))}
                 </div>
                 <span className="text-sm text-gray-600">
-                  {product.rating} ({product.reviews} reviews)
+                  {product?.data.rating} ({product?.data.reviews} reviews)
                 </span>
               </div>
 
-              {/* Price */}
               <div className="text-4xl font-bold text-blue-600 mb-6">
-                ${product.price}
+                ${product?.data.price}
               </div>
             </div>
 
-            {/* Description */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Description
-              </h3>
               <p className="text-gray-600 leading-relaxed">
-                {product.description}
+                {product?.data?.description?.slice(0, 260) || ""}...
               </p>
             </div>
 
             <Separator />
 
-            {/* Quantity and Add to Cart */}
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-gray-900 mb-2 block">
@@ -225,7 +244,6 @@ const ProductDetail = () => {
 
             <Separator />
 
-            {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardContent className="p-4 text-center">
@@ -254,48 +272,9 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Related Products Section */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Related Products
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {DUMMY_PRODUCTS.filter(
-              (p) => p.category === product.category && p.id !== product.id
-            )
-              .slice(0, 4)
-              .map((relatedProduct) => (
-                <Card
-                  key={relatedProduct.id}
-                  className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
-                  onClick={() => navigate(`/product/${relatedProduct.id}`)}
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={relatedProduct.image}
-                      alt={relatedProduct.name}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {relatedProduct.name}
-                    </h3>
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-xl font-bold text-blue-600">
-                        ${relatedProduct.price}
-                      </span>
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                        <span className="text-sm text-gray-600">
-                          {relatedProduct.rating}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
+        <div className="mt-12">
+          <h1 className="text-lg font-bold">Description:</h1>
+          <p className="text-gray-600 mt-2">{product?.data.description}</p>
         </div>
       </div>
     </div>
